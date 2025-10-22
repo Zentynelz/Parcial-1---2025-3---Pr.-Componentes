@@ -4,7 +4,7 @@ import com.f1pitstop.app.data.database.PitStopDao
 import com.f1pitstop.app.data.exception.PitStopException
 import com.f1pitstop.app.data.model.EstadoPitStop
 import com.f1pitstop.app.data.model.PitStop
-import com.f1pitstop.app.data.model.PitStopEntity
+
 import com.f1pitstop.app.data.model.PitStopStatistics
 import com.f1pitstop.app.data.model.ValidationResult
 import kotlinx.coroutines.flow.Flow
@@ -92,7 +92,7 @@ class PitStopRepository(private val pitStopDao: PitStopDao) {
      * @param pitStop Pit stop a insertar o actualizar.
      * @return ID del registro afectado.
      */
-    suspend fun upsertPitStop(pitStop: PitStopEntity): Long {
+    suspend fun upsertPitStop(pitStop: PitStop): Long {
         val validationResult = validatePitStop(pitStop)
         if (!validationResult.isValid) {
             throw PitStopException.ValidationException(validationResult.getAllErrorsAsString())
@@ -175,24 +175,26 @@ class PitStopRepository(private val pitStopDao: PitStopDao) {
     
     /**
      * Obtiene el tiempo promedio de pit stops
-     * @return Flow con el tiempo promedio o null
+     * @return Tiempo promedio o null
      */
-    fun getAveragePitStopTime(): Flow<Double?> {
-        return pitStopDao.getAverageTime()
-            .catch { exception ->
-                throw PitStopException.DatabaseException("Error al obtener tiempo promedio: ${exception.message}")
-            }
+    suspend fun getAveragePitStopTime(): Double? {
+        return try {
+            pitStopDao.getAverageTime()
+        } catch (exception: Exception) {
+            throw PitStopException.DatabaseException("Error al obtener tiempo promedio: ${exception.message}")
+        }
     }
     
     /**
      * Obtiene el total de pit stops
-     * @return Flow con el número total de pit stops
+     * @return Número total de pit stops
      */
-    fun getTotalPitStopsCount(): Flow<Int> {
-        return pitStopDao.getTotalCount()
-            .catch { exception ->
-                throw PitStopException.DatabaseException("Error al obtener total de pit stops: ${exception.message}")
-            }
+    suspend fun getTotalPitStopsCount(): Int {
+        return try {
+            pitStopDao.getTotalCount()
+        } catch (exception: Exception) {
+            throw PitStopException.DatabaseException("Error al obtener total de pit stops: ${exception.message}")
+        }
     }
     
     /**
@@ -209,11 +211,11 @@ class PitStopRepository(private val pitStopDao: PitStopDao) {
 
     /**
      * Obtiene pit stops por escudería
-     * @param escuderia Nombre de la escudería
+     * @param escuderia Escudería
      * @return Flow con pit stops de la escudería
      */
-    fun getPitStopsByEscuderia(escuderia: String): Flow<List<PitStop>> {
-        return pitStopDao.getPitStopsByEscuderia(escuderia)
+    fun getPitStopsByEscuderia(escuderia: com.f1pitstop.app.data.model.Escuderia): Flow<List<PitStop>> {
+        return pitStopDao.getPitStopsByEscuderia(escuderia.displayName)
             .catch { exception ->
                 throw PitStopException.DatabaseException("Error al obtener pit stops por escudería: ${exception.message}")
             }

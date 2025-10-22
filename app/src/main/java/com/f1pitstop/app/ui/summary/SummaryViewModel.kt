@@ -38,10 +38,10 @@ class SummaryViewModel(private val repository: PitStopRepository) : ViewModel() 
             repository.getFastestPitStop().collect { _fastestPitStop.value = it }
         }
         viewModelScope.launch {
-            repository.getAveragePitStopTime().collect { _averagePitStopTime.value = it }
+            _averagePitStopTime.value = repository.getAveragePitStopTime()
         }
         viewModelScope.launch {
-            repository.getTotalPitStopsCount().collect { _totalPitStopsCount.value = it }
+            _totalPitStopsCount.value = repository.getTotalPitStopsCount()
         }
         viewModelScope.launch {
             repository.getLastNPitStops(5).collect { _lastPitStopsForChart.value = it }

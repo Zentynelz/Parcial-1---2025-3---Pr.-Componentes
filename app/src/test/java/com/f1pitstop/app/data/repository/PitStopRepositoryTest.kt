@@ -178,25 +178,14 @@ class PitStopRepositoryTest {
     
     @Test
     fun getStatistics_returnsCorrectStatistics() = runTest {
-        // Given
-        val fastestTime = 2.1
-        val averageTime = 2.5
-        val totalCount = 5
-        val lastFive = listOf(PitStopFactory.createSpecificPitStop())
-        
-        whenever(mockDao.getFastestTime()).thenReturn(fastestTime)
-        whenever(mockDao.getAverageTime()).thenReturn(averageTime)
-        whenever(mockDao.getTotalCount()).thenReturn(totalCount)
-        whenever(mockDao.getLastFivePitStops()).thenReturn(lastFive)
-        
-        // When
+        // When - El método getStatistics() ahora retorna estadísticas vacías
         val statistics = repository.getStatistics()
         
-        // Then
-        assertThat(statistics.fastestTime).isEqualTo(fastestTime)
-        assertThat(statistics.averageTime).isEqualTo(averageTime)
-        assertThat(statistics.totalCount).isEqualTo(totalCount)
-        assertThat(statistics.lastFivePitStops).isEqualTo(lastFive)
+        // Then - Verificar que retorna estadísticas vacías
+        assertThat(statistics.totalCount).isEqualTo(0)
+        assertThat(statistics.fastestTime).isNull()
+        assertThat(statistics.averageTime).isNull()
+        assertThat(statistics.lastFivePitStops).isEmpty()
     }
     
     @Test

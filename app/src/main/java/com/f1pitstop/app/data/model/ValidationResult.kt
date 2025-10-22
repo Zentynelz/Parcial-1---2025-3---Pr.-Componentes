@@ -1,20 +1,12 @@
 package com.f1pitstop.app.data.model
 
 /**
- * Data class que representa el resultado de una validación
+ * Resultado de una validación de datos
  */
 data class ValidationResult(
     val isValid: Boolean,
-    val errors: List<String> = emptyList()
+    val errors: List<String>
 ) {
-    /**
-     * Obtiene el primer error si existe
-     * @return Primer mensaje de error o null
-     */
-    fun getFirstError(): String? {
-        return errors.firstOrNull()
-    }
-    
     /**
      * Obtiene todos los errores como un string concatenado
      * @return String con todos los errores separados por salto de línea
@@ -23,40 +15,31 @@ data class ValidationResult(
         return errors.joinToString("\n")
     }
     
-    /**
-     * Verifica si hay errores específicos de un campo
-     * @param fieldName Nombre del campo a verificar
-     * @return true si hay errores que contengan el nombre del campo
-     */
-    fun hasErrorForField(fieldName: String): Boolean {
-        return errors.any { it.contains(fieldName, ignoreCase = true) }
-    }
-    
     companion object {
         /**
-         * Crea un resultado válido sin errores
-         * @return ValidationResult válido
+         * Crea un resultado válido
+         * @return ValidationResult válido sin errores
          */
         fun valid(): ValidationResult {
-            return ValidationResult(isValid = true, errors = emptyList())
+            return ValidationResult(true, emptyList())
         }
         
         /**
-         * Crea un resultado inválido con un error
-         * @param error Mensaje de error
-         * @return ValidationResult inválido
-         */
-        fun invalid(error: String): ValidationResult {
-            return ValidationResult(isValid = false, errors = listOf(error))
-        }
-        
-        /**
-         * Crea un resultado inválido con múltiples errores
-         * @param errors Lista de mensajes de error
-         * @return ValidationResult inválido
+         * Crea un resultado inválido con errores
+         * @param errors Lista de errores
+         * @return ValidationResult inválido con errores
          */
         fun invalid(errors: List<String>): ValidationResult {
-            return ValidationResult(isValid = false, errors = errors)
+            return ValidationResult(false, errors)
+        }
+        
+        /**
+         * Crea un resultado inválido con un solo error
+         * @param error Error único
+         * @return ValidationResult inválido con un error
+         */
+        fun invalid(error: String): ValidationResult {
+            return ValidationResult(false, listOf(error))
         }
     }
 }

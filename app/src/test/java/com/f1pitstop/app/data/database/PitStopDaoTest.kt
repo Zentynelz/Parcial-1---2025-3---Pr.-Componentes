@@ -2,8 +2,7 @@ package com.f1pitstop.app.data.database
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.f1pitstop.app.data.database.PitStopDatabase
 import com.f1pitstop.app.data.model.EstadoPitStop
 import com.f1pitstop.app.data.model.Escuderia
 import com.f1pitstop.app.utils.PitStopFactory
@@ -15,11 +14,13 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
 /**
  * Tests unitarios para PitStopDao
  */
-@RunWith(AndroidJUnit4::class)
+@RunWith(RobolectricTestRunner::class)
 class PitStopDaoTest {
     
     @get:Rule
@@ -31,7 +32,7 @@ class PitStopDaoTest {
     @Before
     fun setup() {
         database = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(),
+            RuntimeEnvironment.getApplication(),
             PitStopDatabase::class.java
         ).allowMainThreadQueries().build()
         
