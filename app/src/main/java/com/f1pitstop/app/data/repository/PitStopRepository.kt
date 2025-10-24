@@ -177,7 +177,7 @@ class PitStopRepository(private val pitStopDao: PitStopDao) {
      * Obtiene el tiempo promedio de pit stops
      * @return Tiempo promedio o null
      */
-    suspend fun getAveragePitStopTime(): Double? {
+     fun getAveragePitStopTime(): Flow<Double?> {
         return try {
             pitStopDao.getAverageTime()
         } catch (exception: Exception) {
@@ -189,7 +189,7 @@ class PitStopRepository(private val pitStopDao: PitStopDao) {
      * Obtiene el total de pit stops
      * @return Número total de pit stops
      */
-    suspend fun getTotalPitStopsCount(): Int {
+     fun getTotalPitStopsCount(): Flow<Int> {
         return try {
             pitStopDao.getTotalCount()
         } catch (exception: Exception) {

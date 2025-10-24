@@ -86,14 +86,14 @@ interface PitStopDao {
      * @return Promedio de tiempos o null si no hay pit stops exitosos
      */
     @Query("SELECT AVG(tiempo_total) FROM pit_stops WHERE estado = 'OK'")
-    suspend fun getAverageTime(): Double?
+    fun getAverageTime(): Flow<Double?>
     
     /**
      * Obtiene el total de pit stops registrados
      * @return Número total de pit stops
      */
     @Query("SELECT COUNT(*) FROM pit_stops")
-    suspend fun getTotalCount(): Int
+    fun getTotalCount(): Flow<Int>
     
     /**
      * Obtiene los últimos 5 pit stops para el gráfico
