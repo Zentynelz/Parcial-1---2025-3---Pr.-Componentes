@@ -18,6 +18,7 @@ import co.yml.charts.common.model.Point
 import co.yml.charts.ui.barchart.BarChart
 import co.yml.charts.ui.barchart.models.BarChartData
 import co.yml.charts.ui.barchart.models.BarData
+import com.f1pitstop.app.data.model.EstadoPitStop
 import com.f1pitstop.app.data.model.PitStop
 import com.f1pitstop.app.ui.theme.F1PitStopTheme
 import java.text.SimpleDateFormat
@@ -72,45 +73,45 @@ fun SummaryScreen(
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(20.dp))
 
-        // Estadísticas principales
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            StatisticCard(
-                title = "Pit Stop Más Rápido",
-                value = fastestPitStop?.let { "%.1f s".format(it.tiempoTotal) } ?: "N/A",
-                subtitle = fastestPitStop?.let { 
-                    SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(it.fechaHora)) 
-                } ?: ""
-            )
-            StatisticCard(
-                title = "Promedio Pit Stop",
-                value = averagePitStopTime?.let { "%.1f s".format(it) } ?: "N/A"
-            )
-            StatisticCard(
-                title = "Total Pit Stops",
-                value = totalPitStopsCount.toString()
-            )
-        }
+            // Estadísticas principales
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                StatisticCard(
+                    title = "Pit Stop Más Rápido",
+                    value = fastestPitStop?.let { "%.1f s".format(it.tiempoTotal) } ?: "N/A",
+                    subtitle = fastestPitStop?.let {
+                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(it.fechaHora))
+                    } ?: ""
+                )
+                StatisticCard(
+                    title = "Promedio Pit Stop",
+                    value = averagePitStopTime?.let { "%.1f s".format(it) } ?: "N/A"
+                )
+                StatisticCard(
+                    title = "Total Pit Stops",
+                    value = totalPitStopsCount.toString()
+                )
+            }
 
-        Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-        // Gráfico de barras de los últimos pit stops
-        if (lastPitStopsForChart.isNotEmpty()) {
-            Text(
-                text = "Últimos Pit Stops (Tiempo en segundos)",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-            LastPitStopsBarChart(lastPitStopsForChart)
-        }
+            // Gráfico de barras de los últimos pit stops
+            if (lastPitStopsForChart.isNotEmpty()) {
+                Text(
+                    text = "Últimos Pit Stops (Tiempo en segundos)",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                LastPitStopsBarChart(lastPitStopsForChart)
+            }
 
-        Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // Botones de navegación mejorados
             Card(
@@ -185,36 +186,49 @@ fun StatisticCard(title: String, value: String, subtitle: String = "") {
 @Composable
 fun LastPitStopsBarChart(pitStops: List<PitStop>) {
     if (pitStops.isEmpty()) return
-    
+
+    val fastestPitStop = pitStops.minByOrNull { it.tiempoTotal }
+
     val barData = pitStops.mapIndexed { index, pitStop ->
         BarData(
             point = Point(index.toFloat(), pitStop.tiempoTotal.toFloat()),
-            color = if (pitStop.estado == com.f1pitstop.app.data.model.EstadoPitStop.OK) 
-                Color.Green else Color.Red
+            color = when {
+                pitStop == fastestPitStop -> Color(0xFFFFD700) // Dorado para el más rápido
+                pitStop.estado == com.f1pitstop.app.data.model.EstadoPitStop.OK -> Color.Green
+                else -> Color.Red
+            }
         )
     }
+
+
 
     val xAxisData = AxisData.Builder()
         .axisStepSize(100.dp)
         .steps(barData.size - 1)
         .labelData { index -> pitStops.getOrNull(index)?.piloto ?: "" }
+        .startDrawPadding(40.dp)
         .build()
 
     val yAxisData = AxisData.Builder()
         .steps(5)
-        .labelData { index -> (index * 2).toString() + "s" }
+        .labelData { index -> "${index * 2}s" }
+        .axisLabelColor(Color.White) // 🔹 texto del eje Y en blanco
+        .axisLineColor(Color.Transparent) // 🔹 quita la línea gris del eje
+        .labelAndAxisLinePadding(12.dp)
         .build()
 
     val barChartData = BarChartData(
         chartData = barData,
         xAxisData = xAxisData,
-        yAxisData = yAxisData
+        yAxisData = yAxisData,
+
     )
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(300.dp),
+            .height(300.dp)
+            .padding(0.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         BarChart(modifier = Modifier.fillMaxSize(), barChartData = barChartData)
